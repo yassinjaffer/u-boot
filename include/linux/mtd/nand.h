@@ -769,6 +769,7 @@ struct nand_chip {
 #endif
 
 	struct nand_ecc_ctrl ecc;
+	struct nand_ecc_ctrl *cur_ecc;
 	struct nand_buffers *buffers;
 	struct nand_hw_control hwcontrol;
 
@@ -778,10 +779,47 @@ struct nand_chip {
 
 	struct nand_bbt_descr *badblock_pattern;
 
+	struct list_head partitions;
+	struct mutex part_lock;
+
 	uint8_t *pst;
 
 	void *priv;
 };
+
+/**
+ * struct nand_part - NAND partition structure
+ * @node:	list node used to attach the partition to its NAND dev
+ * @mtd:	MTD partiton info
+ * @master:	MTD device representing the NAND chip
+ * @offset:	partition offset
+ * @ecc:	partition specific ECC struct
+ * @release:	function used to release this nand_part struct
+ *
+ * NAND partitions work as standard MTD partitions except it can override
+ * NAND chip ECC handling.
+ * This is particularly useful for SoCs that need specific ECC configs to boot
+ * from NAND while these ECC configs do not fit the NAND chip ECC requirements.
+ */
+struct nand_part {
+	struct list_head node;
+	struct mtd_info mtd;
+	struct mtd_info *master;
+	uint64_t offset;
+	struct nand_ecc_ctrl *ecc;
+	void (*release)(struct nand_part *part);
+};
+
+static inline struct nand_part *to_nand_part(struct mtd_info *mtd)
+{
+	return container_of(mtd, struct nand_part, mtd);
+}
+
+int nand_add_partition(struct mtd_info *master, struct nand_part *part);
+
+void nand_del_partition(struct nand_part *part);
+
+struct nand_part *nandpart_alloc(void);
 
 /*
  * NAND Flash Manufacturer ID Codes
