@@ -252,4 +252,19 @@
 #define CONFIG_EXTRA_ENV_SETTINGS
 #endif
 
+#ifdef  CONFIG_NAND
+/* FDT support */
+#define CONFIG_OF_CONTROL	/* Use the device tree to set up U-Boot */
+#define CONFIG_OF_SEPARATE
+
+/* NAND config */
+#define CONFIG_CMD_NAND
+#define CONFIG_SUNXI_NAND	
+#define CONFIG_SYS_NAND_SELF_INIT
+#define CONFIG_SYS_MAX_NAND_DEVICE      	1
+#define CONFIG_SYS_NAND_ONFI_DETECTION
+#undef CONFIG_CMD_PART
+
+#endif
+
 #endif /* _SUNXI_COMMON_CONFIG_H */
