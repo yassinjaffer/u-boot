@@ -4909,11 +4909,11 @@ int nand_add_partition(struct mtd_info *master, struct nand_part *part)
 	if (!inserted)
 		list_add_tail(&part->node, &chip->partitions);
 
-	ret = mtd_device_register(mtd, NULL, 0);
+	/*ret = mtd_device_register(mtd, NULL, 0);
 	if (ret) {
 		list_del(&part->node);
 		goto out;
-	}
+	}*/
 
 out:
 	mutex_unlock(&chip->part_lock);
